@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-tomcat-deployment
+  namespace: default
+  labels:
+    app: tomcat-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+       app: petclinic-tomcat
+  template:
+    metadata:
+      labels:
+        app: petclinic-tomcat
+    spec:
+      containers:
+      - image: niagwd01.dev-integration.kbonecloud.com:5000/petclinic/tomcat-petclinic:v4
+        imagePullPolicy: Always
+        name: tomcat-petclinic
+        env:
+        - name: JAVA_OPTS
+          value: "-Xms1024m -Xmx1024m"
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-tomcat-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: petclinic-tomcat
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080

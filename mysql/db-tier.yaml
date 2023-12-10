@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-mysql-deployment
+  namespace: default
+  labels:
+    app: mysql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+       app: petclinic-mysql
+  template:
+    metadata:
+      labels:
+        app: petclinic-mysql
+    spec:
+      containers:
+      - image: niagwd01.dev-integration.kbonecloud.com:5000/petclinic/mysql:5.7.8
+        imagePullPolicy: Always
+        name: mysql-petclinic
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: petclinic
+        - name: MYSQL_DATABASE
+          value: petclinic
+      restartPolicy: Always
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: petclinic-db
+spec:
+  type: NodePort
+  selector:
+    app: petclinic-mysql
+  ports:
+    - port: 3306
+      protocol: TCP
+      targetPort: 3306
+
